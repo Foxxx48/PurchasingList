@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.purchaseList.observe(this) {
-            adapter.shopList = it
+            adapter.purchaseList = it
         }
     }
 
