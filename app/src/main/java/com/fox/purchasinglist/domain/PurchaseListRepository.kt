@@ -1,5 +1,7 @@
 package com.fox.purchasinglist.domain
 
+import androidx.lifecycle.LiveData
+
 interface PurchaseListRepository {
 
      fun addPurchaseItem(purchaseItem: PurchaseItem)
@@ -10,5 +12,5 @@ interface PurchaseListRepository {
 
      fun getPurchaseItem(purchaseItemId: Int): PurchaseItem
 
-     fun getListPurchaseItem(): List<PurchaseItem>
+     fun getListPurchaseItem(): LiveData<List<PurchaseItem>>
 }
