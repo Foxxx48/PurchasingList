@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
@@ -14,9 +15,13 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
     var count = 0
 
     var purchaseList = listOf<PurchaseItem>()
+
         set(value) {
+            val callback = PurchaseListDiffCallback(purchaseList, value)
+            val diffResult = DiffUtil.calculateDiff(callback)
+            diffResult.dispatchUpdatesTo(this)
             field = value
-            notifyDataSetChanged()
+
         }
 
      var onPurchaseItemLongClickListener: ((PurchaseItem)->Unit)? = null
@@ -38,6 +43,7 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
     }
 
     override fun onBindViewHolder(viewHolder: PurchaseItemViewHolder, position: Int) {
+        Log.d("ShopListAdapter", "onBindViewHolder, count: ${++count}")
         val purchaseItem = purchaseList[position]
 
         viewHolder.view.setOnLongClickListener {
