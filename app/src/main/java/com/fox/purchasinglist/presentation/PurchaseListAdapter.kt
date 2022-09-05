@@ -1,5 +1,6 @@
 package com.fox.purchasinglist.presentation
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
 
 class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseItemViewHolder>() {
+    var count = 0
 
     var purchaseList = listOf<PurchaseItem>()
         set(value) {
@@ -17,9 +19,17 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
             notifyDataSetChanged()
         }
 
+     var onPurchaseItemLongClickListener: OnPurchaseItemLongClickListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseItemViewHolder {
+        Log.d("ShopListAdapter", "onCreateViewHolder, count: ${++count}")
+        val layout = when (viewType) {
+            VIEW_TYPE_DISABLED -> R.layout.item_purchase_disabled
+            VIEW_TYPE_ENABLED -> R.layout.item_purchase_enabled
+            else -> throw RuntimeException("Unknown view type: $viewType")
+        }
         val view = LayoutInflater.from(parent.context).inflate(
-            R.layout.item_purchase_disabled,
+            layout,
             parent,
             false
         )
@@ -28,19 +38,13 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
 
     override fun onBindViewHolder(viewHolder: PurchaseItemViewHolder, position: Int) {
         val purchaseItem = purchaseList[position]
-        val status = if (purchaseItem.enabled) {
-            "Active"
-        } else {
-            "Not active"
-        }
+
         viewHolder.view.setOnLongClickListener {
+            onPurchaseItemLongClickListener?.onPurchaseItemLongClick(purchaseItem)
             true
         }
-        if (purchaseItem.enabled) {
-            viewHolder.tvName.text = "${purchaseItem.name} $status"
-            viewHolder.tvCount.text = purchaseItem.count.toString()
-            viewHolder.tvName.setTextColor(ContextCompat.getColor(viewHolder.view.context, android.R.color.holo_red_light))
-        }
+        viewHolder.tvName.text = purchaseItem.name
+        viewHolder.tvCount.text = purchaseItem.count.toString()
     }
 
     override fun onViewRecycled(viewHolder: PurchaseItemViewHolder) {
@@ -57,5 +61,26 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
     class PurchaseItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val tvName = view.findViewById<TextView>(R.id.tv_name)
         val tvCount = view.findViewById<TextView>(R.id.tv_count)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val item = purchaseList[position]
+        return if (item.enabled) {
+            VIEW_TYPE_ENABLED
+        } else {
+            VIEW_TYPE_DISABLED
+        }
+    }
+
+    interface OnPurchaseItemLongClickListener {
+        fun onPurchaseItemLongClick(purchaseItem: PurchaseItem)
+    }
+
+    companion object {
+
+        const val VIEW_TYPE_ENABLED = 100
+        const val VIEW_TYPE_DISABLED = 101
+
+        const val MAX_POOL_SIZE = 30
     }
 }
