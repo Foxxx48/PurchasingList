@@ -1,5 +1,6 @@
 package com.fox.purchasinglist.presentation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,6 +32,10 @@ class MainViewModel: ViewModel() {
         val newItem = purchaseItem.copy(enabled = !purchaseItem.enabled)
         editPurchaseItemUseCase.editPurchase(newItem)
 
+    }
+
+    fun printLog(purchaseItem: PurchaseItem){
+        Log.d("fun printLog", "$purchaseItem")
     }
 
 

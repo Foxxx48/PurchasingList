@@ -19,7 +19,8 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
             notifyDataSetChanged()
         }
 
-     var onPurchaseItemLongClickListener: OnPurchaseItemLongClickListener? = null
+     var onPurchaseItemLongClickListener: ((PurchaseItem)->Unit)? = null
+     var onPurchaseItemClickListener: ((PurchaseItem)->Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseItemViewHolder {
         Log.d("ShopListAdapter", "onCreateViewHolder, count: ${++count}")
@@ -40,8 +41,12 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
         val purchaseItem = purchaseList[position]
 
         viewHolder.view.setOnLongClickListener {
-            onPurchaseItemLongClickListener?.onPurchaseItemLongClick(purchaseItem)
+            onPurchaseItemLongClickListener?.invoke(purchaseItem)
             true
+        }
+
+        viewHolder.view.setOnClickListener {
+            onPurchaseItemClickListener?.invoke(purchaseItem)
         }
         viewHolder.tvName.text = purchaseItem.name
         viewHolder.tvCount.text = purchaseItem.count.toString()

@@ -2,10 +2,11 @@ package com.fox.purchasinglist.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.purchasinglist.R
-import com.fox.purchasinglist.domain.PurchaseItem
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,8 +26,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
-        with(rvShopList) {
+        val rvPurchaseList = findViewById<RecyclerView>(R.id.rv_shop_list)
+        with(rvPurchaseList) {
             purchaseListAdapter = PurchaseListAdapter()
             adapter = purchaseListAdapter
             recycledViewPool.setMaxRecycledViews(
@@ -38,11 +39,44 @@ class MainActivity : AppCompatActivity() {
                 PurchaseListAdapter.MAX_POOL_SIZE
             )
         }
-        purchaseListAdapter.onPurchaseItemLongClickListener = object : PurchaseListAdapter.OnPurchaseItemLongClickListener {
-            override fun onPurchaseItemLongClick(purchaseItem: PurchaseItem) {
-                viewModel.changeEnableState(purchaseItem)
+        setupLongClickListener()
+        setupClickListener()
+        setupSwipeListener(rvPurchaseList)
+
+
+    }
+
+    private fun setupSwipeListener(rvPurchaseList: RecyclerView) {
+        val callback = object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
             }
 
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val item = purchaseListAdapter.purchaseList[viewHolder.adapterPosition]
+                viewModel.deletePurchaseItem(item)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(rvPurchaseList)
+    }
+
+    private fun setupClickListener() {
+        purchaseListAdapter.onPurchaseItemClickListener = {
+            viewModel.printLog(it)
+            Log.d("MainActivity", "$it")
+        }
+    }
+
+    private fun setupLongClickListener() {
+        purchaseListAdapter.onPurchaseItemLongClickListener = {
+            viewModel.changeEnableState(it)
         }
     }
 
