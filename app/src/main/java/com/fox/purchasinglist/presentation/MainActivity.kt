@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.purchaseList.observe(this) {
-            purchaseListAdapter.purchaseList = it
+            purchaseListAdapter.submitList(it)
         }
         val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
         addButton.setOnClickListener {
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = purchaseListAdapter.purchaseList[viewHolder.adapterPosition]
+                val item = purchaseListAdapter.currentList[viewHolder.adapterPosition]
                 viewModel.deletePurchaseItem(item)
             }
         }

@@ -2,33 +2,18 @@ package com.fox.purchasinglist.presentation
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
 
-class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseItemViewHolder>() {
-    var count = 0
-
-    var purchaseList = listOf<PurchaseItem>()
-
-        set(value) {
-            val callback = PurchaseListDiffCallback(purchaseList, value)
-            val diffResult = DiffUtil.calculateDiff(callback)
-            diffResult.dispatchUpdatesTo(this)
-            field = value
-
-        }
-
-     var onPurchaseItemLongClickListener: ((PurchaseItem)->Unit)? = null
-     var onPurchaseItemClickListener: ((PurchaseItem)->Unit)? = null
+class PurchaseListAdapter : ListAdapter<PurchaseItem, PurchaseItemViewHolder>(PurchaseItemDiffCallback()) {
+//    var count = 0
+    var onPurchaseItemLongClickListener: ((PurchaseItem)->Unit)? = null
+    var onPurchaseItemClickListener: ((PurchaseItem)->Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseItemViewHolder {
-        Log.d("ShopListAdapter", "onCreateViewHolder, count: ${++count}")
+//        Log.d("ShopListAdapter", "onCreateViewHolder, count: ${++count}")
         val layout = when (viewType) {
             VIEW_TYPE_DISABLED -> R.layout.item_purchase_disabled
             VIEW_TYPE_ENABLED -> R.layout.item_purchase_enabled
@@ -43,8 +28,8 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
     }
 
     override fun onBindViewHolder(viewHolder: PurchaseItemViewHolder, position: Int) {
-        Log.d("ShopListAdapter", "onBindViewHolder, count: ${++count}")
-        val purchaseItem = purchaseList[position]
+//        Log.d("ShopListAdapter", "onBindViewHolder, count: ${++count}")
+        val purchaseItem = getItem(position)
 
         viewHolder.view.setOnLongClickListener {
             onPurchaseItemLongClickListener?.invoke(purchaseItem)
@@ -58,33 +43,13 @@ class PurchaseListAdapter : RecyclerView.Adapter<PurchaseListAdapter.PurchaseIte
         viewHolder.tvCount.text = purchaseItem.count.toString()
     }
 
-    override fun onViewRecycled(viewHolder: PurchaseItemViewHolder) {
-        super.onViewRecycled(viewHolder)
-        viewHolder.tvName.text = ""
-        viewHolder.tvCount.text = ""
-        viewHolder.tvName.setTextColor(ContextCompat.getColor(viewHolder.view.context, android.R.color.white))
-    }
-
-    override fun getItemCount(): Int {
-        return purchaseList.size
-    }
-
-    class PurchaseItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val tvName = view.findViewById<TextView>(R.id.tv_name)
-        val tvCount = view.findViewById<TextView>(R.id.tv_count)
-    }
-
     override fun getItemViewType(position: Int): Int {
-        val item = purchaseList[position]
+        val item = getItem(position)
         return if (item.enabled) {
             VIEW_TYPE_ENABLED
         } else {
             VIEW_TYPE_DISABLED
         }
-    }
-
-    interface OnPurchaseItemLongClickListener {
-        fun onPurchaseItemLongClick(purchaseItem: PurchaseItem)
     }
 
     companion object {
