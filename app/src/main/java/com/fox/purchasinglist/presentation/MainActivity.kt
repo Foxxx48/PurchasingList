@@ -1,12 +1,13 @@
 package com.fox.purchasinglist.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.purchasinglist.R
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +23,11 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.purchaseList.observe(this) {
             purchaseListAdapter.purchaseList = it
+        }
+        val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        addButton.setOnClickListener {
+            val intent = PurchaseItemActivity.newIntentAddItem(this)
+            startActivity(intent)
         }
     }
 
@@ -69,8 +75,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         purchaseListAdapter.onPurchaseItemClickListener = {
-            viewModel.printLog(it)
-            Log.d("MainActivity", "$it")
+//            viewModel.printLog(it)
+            val intent = PurchaseItemActivity.newIntentEditItem(this, it.id)
+            Log.d("MainActivity", "${it.id}")
+            startActivity(intent)
         }
     }
 
