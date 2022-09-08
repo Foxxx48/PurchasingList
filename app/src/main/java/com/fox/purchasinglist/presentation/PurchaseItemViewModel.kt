@@ -1,5 +1,7 @@
 package com.fox.purchasinglist.presentation
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
 import com.fox.purchasinglist.domain.*
@@ -13,8 +15,28 @@ class PurchaseItemViewModel: ViewModel() {
     private val addPurchaseItemUseCase = AddPurchaseItemUseCase(repository)
     private val editPurchaseItemUseCase = EditPurchaseItemUseCase(repository)
 
+    private val _errorInputName = MutableLiveData<Boolean>()
+    val errorInputName: LiveData<Boolean>
+        get() = _errorInputName
+
+    private val _errorInputCount = MutableLiveData<Boolean>()
+    val errorInputCount: LiveData<Boolean>
+        get() = _errorInputCount
+
+    private val _purchaseItem = MutableLiveData<PurchaseItem>()
+    val purchaseItem: LiveData<PurchaseItem>
+        get() =_purchaseItem
+
+    private val _shouldCloseScreen = MutableLiveData<Unit>()
+    val shouldCloseScreen: LiveData<Unit>
+        get() = _shouldCloseScreen
+
+
+
+
     fun getPurchaseItem(purchaseItemId: Int) {
        val item = getPurchaseItemUseCase.getPurchase(purchaseItemId)
+        _purchaseItem.value = item
     }
 
     fun addPurchaseItem(inputName: String?, inputCount: String?) {
@@ -24,6 +46,7 @@ class PurchaseItemViewModel: ViewModel() {
         if (fieldsValidate) {
             val purchaseItem = PurchaseItem(name, count, true)
             addPurchaseItemUseCase.addPurchase(purchaseItem)
+            finishWork()
         }
 
     }
@@ -32,8 +55,11 @@ class PurchaseItemViewModel: ViewModel() {
         val count = parseCount(inputCount)
         val fieldsValidate = validateInput(name, count)
         if (fieldsValidate) {
-            val purchaseItem = PurchaseItem(name, count, true)
-            editPurchaseItemUseCase.editPurchase(purchaseItem)
+            _purchaseItem.value?.let {
+                val item = it.copy(name = name, count = count)
+                editPurchaseItemUseCase.editPurchase(item)
+                finishWork()
+            }
         }
 
     }
@@ -51,13 +77,25 @@ class PurchaseItemViewModel: ViewModel() {
     private fun validateInput(name: String, count: Int): Boolean {
         var result = true
         if (name.isBlank()) {
-            // TODO: show Error input name
+            _errorInputName.value = true
             result = false
         }
         if (count <= 0) {
-            // TODO: show Error input count
+            _errorInputCount.value = true
             result = false
         }
         return result
+    }
+
+    fun resetErrorInputName() {
+        _errorInputName.value = false
+    }
+
+    fun resetErrorInputCount() {
+        _errorInputCount.value = false
+    }
+
+    private fun finishWork() {
+        _shouldCloseScreen.value = Unit
     }
 }

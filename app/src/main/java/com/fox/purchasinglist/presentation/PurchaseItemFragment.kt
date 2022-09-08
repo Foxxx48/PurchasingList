@@ -76,18 +76,6 @@ class PurchaseItemFragment : Fragment() {
     }
 
     private fun launchRightMode() {
-//        if(screenMode == MODE_EDIT) {
-//            launchEditMode()
-//            println("$screenMode")
-//        }
-//        if(screenMode == MODE_ADD ) {
-//            launchEditMode()
-//            println("$screenMode")
-//        } else {
-//            println("Unknown Exception")
-//        }
-
-
         println("LaunchRightMode($screenMode)")
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
