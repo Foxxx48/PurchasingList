@@ -3,6 +3,10 @@ package com.fox.purchasinglist.presentation
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainer
+import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +17,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var purchaseListAdapter: PurchaseListAdapter
+    private var purchaseItemContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        purchaseItemContainer = findViewById(R.id.purchase_item_container)
 
         setupRecyclerView()
 
@@ -26,9 +32,26 @@ class MainActivity : AppCompatActivity() {
         }
         val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
         addButton.setOnClickListener {
-            val intent = PurchaseItemActivity.newIntentAddItem(this)
-            startActivity(intent)
+            if(isOnePaneMode()) {
+                val intent = PurchaseItemActivity.newIntentAddItem(this)
+                startActivity(intent)
+            } else {
+                launchFragment(PurchaseItemFragment.newInstanceAddItem())
+            }
+
         }
+    }
+
+    private fun isOnePaneMode(): Boolean {
+        return purchaseItemContainer == null
+    }
+
+    private fun launchFragment(fragment: Fragment){
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.purchase_item_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setupRecyclerView() {
@@ -75,10 +98,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         purchaseListAdapter.onPurchaseItemClickListener = {
-//            viewModel.printLog(it)
-            val intent = PurchaseItemActivity.newIntentEditItem(this, it.id)
-            Log.d("MainActivity", "${it.id}")
-            startActivity(intent)
+            if(isOnePaneMode()){
+                val intent = PurchaseItemActivity.newIntentEditItem(this, it.id)
+                Log.d("MainActivity", "${it.id}")
+                startActivity(intent)
+            } else {
+                launchFragment(PurchaseItemFragment.newInstanceEditItem(it.id))
+            }
+
         }
     }
 
