@@ -4,10 +4,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
 
-class PurchaseItemActivity : AppCompatActivity() {
+class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
 
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = PurchaseItem.UNDEFINED_ID
@@ -16,17 +17,22 @@ class PurchaseItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_purchase_item)
         parseIntent()
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             launchRightMode()
         }
-
     }
+
+    override fun onEditingFinished() {
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+        finish()
+    }
+
 
     private fun launchRightMode() {
         val fragment = when (screenMode) {
             MODE_EDIT -> PurchaseItemFragment.newInstanceEditItem(shopItemId)
-            MODE_ADD  -> PurchaseItemFragment.newInstanceAddItem()
-            else      -> throw RuntimeException("Unknown screen mode $screenMode")
+            MODE_ADD -> PurchaseItemFragment.newInstanceAddItem()
+            else -> throw RuntimeException("Unknown screen mode $screenMode")
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.purchase_item_container, fragment)
