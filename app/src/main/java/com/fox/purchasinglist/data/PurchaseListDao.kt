@@ -12,7 +12,7 @@ interface PurchaseListDao {
     @Query("SELECT * FROM purchase_list" )
     fun getPurchaseList(): LiveData<List<PurchaseItemDbModel>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(entity = PurchaseItemDbModel::class, onConflict = OnConflictStrategy.REPLACE)
     fun addPurchaseItem(purchaseItemDbModel: PurchaseItemDbModel)
 
     @Query("DELETE FROM purchase_list WHERE id=:purchaseItemId")

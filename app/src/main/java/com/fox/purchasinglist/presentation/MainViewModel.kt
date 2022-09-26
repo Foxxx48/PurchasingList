@@ -3,11 +3,11 @@ package com.fox.purchasinglist.presentation
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
-import com.fox.purchasinglist.domain.*
+import com.fox.purchasinglist.domain.DeletePurchaseItemUseCase
+import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
+import com.fox.purchasinglist.domain.GetListPurchaseItemUseCase
+import com.fox.purchasinglist.domain.PurchaseItem
 
 class MainViewModel(application: Application): AndroidViewModel(application) {
 

@@ -11,7 +11,7 @@ import com.fox.purchasinglist.domain.PurchaseItem
 class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
 
     private var screenMode = MODE_UNKNOWN
-    private var shopItemId = PurchaseItem.UNDEFINED_ID
+    private var purchaseItemId = PurchaseItem.UNDEFINED_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
 
     private fun launchRightMode() {
         val fragment = when (screenMode) {
-            MODE_EDIT -> PurchaseItemFragment.newInstanceEditItem(shopItemId)
+            MODE_EDIT -> PurchaseItemFragment.newInstanceEditItem(purchaseItemId)
             MODE_ADD -> PurchaseItemFragment.newInstanceAddItem()
             else -> throw RuntimeException("Unknown screen mode $screenMode")
         }
@@ -52,7 +52,7 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
             if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)) {
                 throw RuntimeException("Param shop item id is absent")
             }
-            shopItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, PurchaseItem.UNDEFINED_ID)
+            purchaseItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, PurchaseItem.UNDEFINED_ID)
         }
     }
 
