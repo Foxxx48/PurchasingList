@@ -14,20 +14,20 @@ class PurchaseListRepositoryImpl(
 
     private val mapper = PurchaseListMapper()
 
-    override fun addPurchaseItem(purchaseItem: PurchaseItem) {
+    override suspend fun addPurchaseItem(purchaseItem: PurchaseItem) {
         purchaseListDao.addPurchaseItem(mapper.mapEntityToDbModel(purchaseItem))
 
     }
 
-    override fun deletePurchaseItem(purchaseItem: PurchaseItem) {
+    override suspend fun deletePurchaseItem(purchaseItem: PurchaseItem) {
         purchaseListDao.deletePurchaseItem(purchaseItem.id)
     }
 
-    override fun editPurchaseItem(purchaseItem: PurchaseItem) {
+    override suspend fun editPurchaseItem(purchaseItem: PurchaseItem) {
         purchaseListDao.addPurchaseItem(mapper.mapEntityToDbModel(purchaseItem))
     }
 
-    override fun getPurchaseItem(purchaseItemId: Int): PurchaseItem {
+    override suspend fun getPurchaseItem(purchaseItemId: Int): PurchaseItem {
         val dbModel = purchaseListDao.getPurchaseItem(purchaseItemId)
         return mapper.mapDbModelToEntity(dbModel)
 

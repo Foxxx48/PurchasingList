@@ -9,14 +9,17 @@ import com.fox.purchasinglist.domain.AddPurchaseItemUseCase
 import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
 import com.fox.purchasinglist.domain.GetPurchaseItemUseCase
 import com.fox.purchasinglist.domain.PurchaseItem
+import kotlinx.coroutines.*
 
-class PurchaseItemViewModel(application: Application): AndroidViewModel(application) {
+class PurchaseItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = PurchaseListRepositoryImpl(application)
 
-    private val getPurchaseItemUseCase= GetPurchaseItemUseCase(repository)
+    private val getPurchaseItemUseCase = GetPurchaseItemUseCase(repository)
     private val addPurchaseItemUseCase = AddPurchaseItemUseCase(repository)
     private val editPurchaseItemUseCase = EditPurchaseItemUseCase(repository)
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>
@@ -28,7 +31,7 @@ class PurchaseItemViewModel(application: Application): AndroidViewModel(applicat
 
     private val _purchaseItem = MutableLiveData<PurchaseItem>()
     val purchaseItem: LiveData<PurchaseItem>
-        get() =_purchaseItem
+        get() = _purchaseItem
 
     private val _shouldCloseScreen = MutableLiveData<Unit>()
     val shouldCloseScreen: LiveData<Unit>
@@ -36,8 +39,10 @@ class PurchaseItemViewModel(application: Application): AndroidViewModel(applicat
 
 
     fun getPurchaseItem(purchaseItemId: Int) {
-       val item = getPurchaseItemUseCase.getPurchase(purchaseItemId)
-        _purchaseItem.value = item
+        scope.launch {
+            val item = getPurchaseItemUseCase.getPurchase(purchaseItemId)
+            _purchaseItem.postValue(item)
+        }
     }
 
     fun addPurchaseItem(inputName: String?, inputCount: String?) {
@@ -45,25 +50,30 @@ class PurchaseItemViewModel(application: Application): AndroidViewModel(applicat
         val count = parseCount(inputCount)
         val fieldsValidate = validateInput(name, count)
         if (fieldsValidate) {
-            val purchaseItem = PurchaseItem(name, count, true)
-            addPurchaseItemUseCase.addPurchase(purchaseItem)
-            finishWork()
-        }
+            scope.launch {
+                val purchaseItem = PurchaseItem(name, count, true)
+                addPurchaseItemUseCase.addPurchase(purchaseItem)
+                finishWork()
+            }
 
+        }
     }
-    fun editPurchaseItem(inputName: String?, inputCount: String?){
+
+    fun editPurchaseItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
         val fieldsValidate = validateInput(name, count)
         if (fieldsValidate) {
             _purchaseItem.value?.let {
-                val item = it.copy(name = name, count = count)
-                editPurchaseItemUseCase.editPurchase(item)
-                finishWork()
+                scope.launch {
+                    val item = it.copy(name = name, count = count)
+                    editPurchaseItemUseCase.editPurchase(item)
+                    finishWork()
+                }
             }
         }
-
     }
+
     private fun parseName(inputName: String?): String {
         return inputName?.trim() ?: ""
     }
@@ -75,6 +85,7 @@ class PurchaseItemViewModel(application: Application): AndroidViewModel(applicat
             0
         }
     }
+
     private fun validateInput(name: String, count: Int): Boolean {
         var result = true
         if (name.isBlank()) {
@@ -97,6 +108,11 @@ class PurchaseItemViewModel(application: Application): AndroidViewModel(applicat
     }
 
     private fun finishWork() {
-        _shouldCloseScreen.value = Unit
+        _shouldCloseScreen.postValue(Unit)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        scope.cancel()
     }
 }

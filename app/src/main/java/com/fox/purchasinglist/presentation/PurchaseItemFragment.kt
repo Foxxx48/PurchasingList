@@ -133,6 +133,7 @@ class PurchaseItemFragment : Fragment() {
             etCount.setText(it.count.toString())
             println("PurchaseItem Count ${it.count}")
         }
+
         buttonSave.setOnClickListener {
             viewModel.editPurchaseItem(etName.text?.toString(), etCount.text?.toString())
         }
@@ -204,7 +205,5 @@ class PurchaseItemFragment : Fragment() {
                 }
             }
         }
-
-
     }
 }
