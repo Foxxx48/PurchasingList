@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
 import com.fox.purchasinglist.domain.AddPurchaseItemUseCase
 import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
@@ -19,7 +20,7 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
     private val addPurchaseItemUseCase = AddPurchaseItemUseCase(repository)
     private val editPurchaseItemUseCase = EditPurchaseItemUseCase(repository)
 
-    private val scope = CoroutineScope(Dispatchers.IO)
+
 
     private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>
@@ -39,9 +40,9 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
 
 
     fun getPurchaseItem(purchaseItemId: Int) {
-        scope.launch {
+        viewModelScope.launch {
             val item = getPurchaseItemUseCase.getPurchase(purchaseItemId)
-            _purchaseItem.postValue(item)
+            _purchaseItem.value = item
         }
     }
 
@@ -50,7 +51,7 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
         val count = parseCount(inputCount)
         val fieldsValidate = validateInput(name, count)
         if (fieldsValidate) {
-            scope.launch {
+            viewModelScope.launch {
                 val purchaseItem = PurchaseItem(name, count, true)
                 addPurchaseItemUseCase.addPurchase(purchaseItem)
                 finishWork()
@@ -65,7 +66,7 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
         val fieldsValidate = validateInput(name, count)
         if (fieldsValidate) {
             _purchaseItem.value?.let {
-                scope.launch {
+                viewModelScope.launch {
                     val item = it.copy(name = name, count = count)
                     editPurchaseItemUseCase.editPurchase(item)
                     finishWork()
@@ -108,11 +109,7 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun finishWork() {
-        _shouldCloseScreen.postValue(Unit)
+        _shouldCloseScreen.value = Unit
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        scope.cancel()
-    }
 }
