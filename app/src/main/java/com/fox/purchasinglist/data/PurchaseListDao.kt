@@ -8,6 +8,7 @@ import androidx.room.Query
 
 @Dao
 interface PurchaseListDao {
+
     @Query("SELECT * FROM purchase_list" )
     fun getPurchaseList(): LiveData<List<PurchaseItemDbModel>>
 

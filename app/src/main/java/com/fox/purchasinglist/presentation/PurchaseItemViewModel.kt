@@ -1,15 +1,18 @@
 package com.fox.purchasinglist.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
-import com.fox.purchasinglist.domain.*
-import java.lang.Exception as Exception
+import com.fox.purchasinglist.domain.AddPurchaseItemUseCase
+import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
+import com.fox.purchasinglist.domain.GetPurchaseItemUseCase
+import com.fox.purchasinglist.domain.PurchaseItem
 
-class PurchaseItemViewModel: ViewModel() {
+class PurchaseItemViewModel(application: Application): AndroidViewModel(application) {
 
-    private val repository = PurchaseListRepositoryImpl
+    private val repository = PurchaseListRepositoryImpl(application)
 
     private val getPurchaseItemUseCase= GetPurchaseItemUseCase(repository)
     private val addPurchaseItemUseCase = AddPurchaseItemUseCase(repository)
@@ -30,8 +33,6 @@ class PurchaseItemViewModel: ViewModel() {
     private val _shouldCloseScreen = MutableLiveData<Unit>()
     val shouldCloseScreen: LiveData<Unit>
         get() = _shouldCloseScreen
-
-
 
 
     fun getPurchaseItem(purchaseItemId: Int) {

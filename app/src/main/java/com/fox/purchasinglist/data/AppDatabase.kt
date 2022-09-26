@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.util.DBUtil
 
 
 @Database(entities = [PurchaseItemDbModel::class], version = 1, exportSchema = false)
@@ -13,6 +12,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun purchaseListDao(): PurchaseListDao
 
     companion object {
+
         private var INSTANCE: AppDatabase? = null
         private val LOCK = Any()
         private const val DB_NAME = "purchase_item.db"
@@ -34,8 +34,6 @@ abstract class AppDatabase : RoomDatabase() {
                 INSTANCE = db
                 return db
             }
-
         }
     }
-
 }
