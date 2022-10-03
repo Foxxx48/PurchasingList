@@ -32,7 +32,7 @@ class PurchaseItemViewModel @Inject constructor(
 
     fun getPurchaseItem(purchaseItemId: Int) {
         viewModelScope.launch {
-            val item = getPurchaseItemUseCase.getPurchase(purchaseItemId)
+            val item = getPurchaseItemUseCase(purchaseItemId)
             _purchaseItem.value = item
         }
     }
@@ -44,7 +44,7 @@ class PurchaseItemViewModel @Inject constructor(
         if (fieldsValidate) {
             viewModelScope.launch {
                 val purchaseItem = PurchaseItem(name, count, true)
-                addPurchaseItemUseCase.addPurchase(purchaseItem)
+                addPurchaseItemUseCase(purchaseItem)
                 finishWork()
             }
 
@@ -59,7 +59,7 @@ class PurchaseItemViewModel @Inject constructor(
             _purchaseItem.value?.let {
                 viewModelScope.launch {
                     val item = it.copy(name = name, count = count)
-                    editPurchaseItemUseCase.editPurchase(item)
+                    editPurchaseItemUseCase(item)
                     finishWork()
                 }
             }

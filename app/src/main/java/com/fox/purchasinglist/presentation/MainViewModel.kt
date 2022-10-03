@@ -16,18 +16,18 @@ class MainViewModel @Inject constructor(
     private val deletePurchaseItemUseCase: DeletePurchaseItemUseCase
 ) : ViewModel() {
 
-    val purchaseList = getListPurchaseItemUseCase.getListPurchase()
+    val purchaseList = getListPurchaseItemUseCase()
 
     fun deletePurchaseItem(purchaseItem: PurchaseItem) {
         viewModelScope.launch {
-            deletePurchaseItemUseCase.deletePurchase(purchaseItem)
+            deletePurchaseItemUseCase(purchaseItem)
         }
     }
 
     fun changeEnableState(purchaseItem: PurchaseItem) {
         viewModelScope.launch {
             val newItem = purchaseItem.copy(enabled = !purchaseItem.enabled)
-            editPurchaseItemUseCase.editPurchase(newItem)
+            editPurchaseItemUseCase(newItem)
         }
     }
 
