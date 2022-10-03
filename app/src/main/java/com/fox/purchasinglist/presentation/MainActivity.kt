@@ -11,11 +11,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
+import com.fox.purchasinglist.databinding.ActivityMainBinding
 import com.fox.purchasinglist.presentation.adapter.PurchaseListAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
+
+    private var _binding: ActivityMainBinding? = null
+    private val binding
+        get() = _binding ?: throw RuntimeException("ActivityMainBinding is null")
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -36,17 +40,17 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
     override fun onCreate(savedInstanceState: Bundle?) {
         myComponent.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        purchaseItemContainer = findViewById(R.id.purchase_item_container)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        purchaseItemContainer = binding.purchaseItemContainer
 
         setupRecyclerView()
 
         viewModel.purchaseList.observe(this) {
             purchaseListAdapter.submitList(it)
         }
-        val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
-        addButton.setOnClickListener {
-            if(isOnePaneMode()) {
+        binding.buttonAddPurchaseItem.setOnClickListener {
+            if (isOnePaneMode()) {
                 val intent = PurchaseItemActivity.newIntentAddItem(this)
                 startActivity(intent)
             } else {
@@ -65,7 +69,7 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
         return purchaseItemContainer == null
     }
 
-    private fun launchFragment(fragment: Fragment){
+    private fun launchFragment(fragment: Fragment) {
         supportFragmentManager.popBackStack()
         supportFragmentManager.beginTransaction()
             .replace(R.id.purchase_item_container, fragment)
@@ -74,7 +78,7 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
     }
 
     private fun setupRecyclerView() {
-        val rvPurchaseList = findViewById<RecyclerView>(R.id.rv_shop_list)
+        val rvPurchaseList = binding.rvPurchaseList
         with(rvPurchaseList) {
             purchaseListAdapter = PurchaseListAdapter()
             adapter = purchaseListAdapter
@@ -117,7 +121,7 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
 
     private fun setupClickListener() {
         purchaseListAdapter.onPurchaseItemClickListener = {
-            if(isOnePaneMode()){
+            if (isOnePaneMode()) {
                 val intent = PurchaseItemActivity.newIntentEditItem(this, it.id)
                 Log.d("MainActivity", "${it.id}")
                 startActivity(intent)
@@ -132,6 +136,11 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
         purchaseListAdapter.onPurchaseItemLongClickListener = {
             viewModel.changeEnableState(it)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
 }

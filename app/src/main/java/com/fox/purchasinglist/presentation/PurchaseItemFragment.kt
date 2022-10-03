@@ -14,12 +14,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
+import com.fox.purchasinglist.databinding.FragmentPurchaseItemBinding
 import com.fox.purchasinglist.domain.PurchaseItem
 import com.google.android.material.textfield.TextInputLayout
 import javax.inject.Inject
 
 
 class PurchaseItemFragment : Fragment() {
+
+    private var _binding: FragmentPurchaseItemBinding? = null
+    private val binding
+        get() = _binding ?: throw RuntimeException("FragmentPurchaseItemBinding is null")
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -36,14 +41,6 @@ class PurchaseItemFragment : Fragment() {
 
 
     lateinit var onEditingFinishListener: OnEditingFinishListener
-
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var buttonSave: Button
-
-
 
     private var screenMode = MODE_UNKNOWN
     private var purchaseItemId = PurchaseItem.UNDEFINED_ID
@@ -69,13 +66,13 @@ class PurchaseItemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_purchase_item, container, false)
+        _binding = FragmentPurchaseItemBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViews(view)
         addTextChangeListeners()
         launchRightMode()
         observeViewModel()
@@ -89,7 +86,7 @@ class PurchaseItemFragment : Fragment() {
             } else {
                 null
             }
-            tilCount.error = message
+                binding.tilCount.error = message
         }
         viewModel.errorInputName.observe(viewLifecycleOwner) {
             val message = if (it) {
@@ -97,7 +94,7 @@ class PurchaseItemFragment : Fragment() {
             } else {
                 null
             }
-            tilName.error = message
+            binding.tilName.error = message
         }
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
             onEditingFinishListener?.onEditingFinished()
@@ -116,7 +113,7 @@ class PurchaseItemFragment : Fragment() {
     }
 
     private fun addTextChangeListeners() {
-        etName.addTextChangedListener(object : TextWatcher {
+        binding.etName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -127,7 +124,7 @@ class PurchaseItemFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
             }
         })
-        etCount.addTextChangedListener(object : TextWatcher {
+        binding.etCount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -145,21 +142,25 @@ class PurchaseItemFragment : Fragment() {
         println("LaunchEditMode()")
 
         viewModel.purchaseItem.observe(viewLifecycleOwner) {
-            etName.setText(it.name)
+            binding.etName.setText(it.name)
             println("PurchaseItem Name ${it.name}")
-            etCount.setText(it.count.toString())
+            binding.etCount.setText(it.count.toString())
             println("PurchaseItem Count ${it.count}")
         }
 
-        buttonSave.setOnClickListener {
-            viewModel.editPurchaseItem(etName.text?.toString(), etCount.text?.toString())
+        binding.btnSave.setOnClickListener {
+            viewModel.editPurchaseItem(
+                binding.etName.text?.toString(),
+                binding.etCount.text?.toString())
         }
     }
 
     private fun launchAddMode() {
         println("LaunchAddMode()")
-        buttonSave.setOnClickListener {
-            viewModel.addPurchaseItem(etName.text?.toString(), etCount.text?.toString())
+        binding.btnSave.setOnClickListener {
+            viewModel.addPurchaseItem(
+                binding.etName.text?.toString(),
+                binding.etCount.text?.toString())
         }
     }
 
@@ -184,18 +185,13 @@ class PurchaseItemFragment : Fragment() {
         }
 
     }
-
-
-    private fun initViews(view: View) {
-        tilName = view.findViewById(R.id.til_name)
-        tilCount = view.findViewById(R.id.til_count)
-        etName = view.findViewById(R.id.et_name)
-        etCount = view.findViewById(R.id.et_count)
-        buttonSave = view.findViewById(R.id.btn_save)
-    }
-
     interface OnEditingFinishListener {
         fun onEditingFinished()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     companion object {

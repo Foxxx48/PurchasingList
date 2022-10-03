@@ -16,21 +16,8 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
     private var screenMode = MODE_UNKNOWN
     private var purchaseItemId = PurchaseItem.UNDEFINED_ID
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
 
-    private val viewModel by lazy {
-
-        ViewModelProvider(this, viewModelFactory)[PurchaseItemViewModel::class.java]
-    }
-
-
-    private val myComponent by lazy {
-        (application as PurchaseItemApp).myComponent
-
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
-        myComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_purchase_item)
         parseIntent()
@@ -66,10 +53,10 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
         }
         screenMode = mode
         if (screenMode == MODE_EDIT) {
-            if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)) {
-                throw RuntimeException("Param shop item id is absent")
+            if (!intent.hasExtra(EXTRA_PURCHASE_ITEM_ID)) {
+                throw RuntimeException("Param purchase item id is absent")
             }
-            purchaseItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, PurchaseItem.UNDEFINED_ID)
+            purchaseItemId = intent.getIntExtra(EXTRA_PURCHASE_ITEM_ID, PurchaseItem.UNDEFINED_ID)
         }
     }
 
@@ -77,7 +64,7 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
     companion object {
 
         private const val EXTRA_SCREEN_MODE = "extra_mode"
-        private const val EXTRA_SHOP_ITEM_ID = "extra_shop_item_id"
+        private const val EXTRA_PURCHASE_ITEM_ID = "extra_purchase_item_id"
         private const val MODE_EDIT = "mode_edit"
         private const val MODE_ADD = "mode_add"
         private const val MODE_UNKNOWN = ""
@@ -91,7 +78,7 @@ class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditing
         fun newIntentEditItem(context: Context, shopItemId: Int): Intent {
             val intent = Intent(context, PurchaseItemActivity::class.java)
             intent.putExtra(EXTRA_SCREEN_MODE, MODE_EDIT)
-            intent.putExtra(EXTRA_SHOP_ITEM_ID, shopItemId)
+            intent.putExtra(EXTRA_PURCHASE_ITEM_ID, shopItemId)
             return intent
         }
     }

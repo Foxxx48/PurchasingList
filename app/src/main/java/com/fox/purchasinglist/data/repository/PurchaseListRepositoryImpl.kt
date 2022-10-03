@@ -10,7 +10,6 @@ import com.fox.purchasinglist.domain.PurchaseListRepository
 import javax.inject.Inject
 
 class PurchaseListRepositoryImpl @Inject constructor(
-    private val application: Application,
     private val purchaseListDao: PurchaseListDao,
     private val mapper: PurchaseListMapper
 
