@@ -1,6 +1,8 @@
 package com.fox.purchasinglist.domain
 
-data class PurchaseItem (
+import javax.inject.Inject
+
+data class PurchaseItem @Inject constructor (
     val name: String,
     val count: Int,
     val enabled: Boolean,

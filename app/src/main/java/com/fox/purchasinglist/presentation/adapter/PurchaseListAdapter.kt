@@ -1,19 +1,20 @@
-package com.fox.purchasinglist.presentation
+package com.fox.purchasinglist.presentation.adapter
 
-import android.util.Log
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
+import javax.inject.Inject
 
-class PurchaseListAdapter : ListAdapter<PurchaseItem, PurchaseItemViewHolder>(PurchaseItemDiffCallback()) {
-//    var count = 0
+class PurchaseListAdapter @Inject constructor() : ListAdapter<PurchaseItem, PurchaseItemViewHolder>(
+    PurchaseItemDiffCallback
+) {
     var onPurchaseItemLongClickListener: ((PurchaseItem)->Unit)? = null
     var onPurchaseItemClickListener: ((PurchaseItem)->Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseItemViewHolder {
-//        Log.d("ShopListAdapter", "onCreateViewHolder, count: ${++count}")
         val layout = when (viewType) {
             VIEW_TYPE_DISABLED -> R.layout.item_purchase_disabled
             VIEW_TYPE_ENABLED -> R.layout.item_purchase_enabled
@@ -28,7 +29,6 @@ class PurchaseListAdapter : ListAdapter<PurchaseItem, PurchaseItemViewHolder>(Pu
     }
 
     override fun onBindViewHolder(viewHolder: PurchaseItemViewHolder, position: Int) {
-//        Log.d("ShopListAdapter", "onBindViewHolder, count: ${++count}")
         val purchaseItem = getItem(position)
 
         viewHolder.view.setOnLongClickListener {

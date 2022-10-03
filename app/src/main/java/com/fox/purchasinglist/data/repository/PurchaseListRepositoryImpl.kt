@@ -1,18 +1,20 @@
-package com.fox.purchasinglist.data
+package com.fox.purchasinglist.data.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.fox.purchasinglist.data.database.PurchaseListDao
+import com.fox.purchasinglist.data.mapper.PurchaseListMapper
 import com.fox.purchasinglist.domain.PurchaseItem
 import com.fox.purchasinglist.domain.PurchaseListRepository
+import javax.inject.Inject
 
-class PurchaseListRepositoryImpl(
-    application: Application
+class PurchaseListRepositoryImpl @Inject constructor(
+    private val application: Application,
+    private val purchaseListDao: PurchaseListDao,
+    private val mapper: PurchaseListMapper
+
 ) : PurchaseListRepository {
-
-    private val purchaseListDao = AppDatabase.getInstance(application).purchaseListDao()
-
-    private val mapper = PurchaseListMapper()
 
     override suspend fun addPurchaseItem(purchaseItem: PurchaseItem) {
         purchaseListDao.addPurchaseItem(mapper.mapEntityToDbModel(purchaseItem))
@@ -38,10 +40,6 @@ class PurchaseListRepositoryImpl(
     ) {
         mapper.mapListDbModelToListEntity(it)
     }
-//        MediatorLiveData<List<PurchaseItem>>().apply {
-//        addSource(purchaseListDao.getPurchaseList()) {
-//            value = mapper.mapListDbModelToListEntity(it)
-//        }
 }
 
 

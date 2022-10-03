@@ -5,15 +5,32 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
+import javax.inject.Inject
 
 class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
 
     private var screenMode = MODE_UNKNOWN
     private var purchaseItemId = PurchaseItem.UNDEFINED_ID
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel by lazy {
+
+        ViewModelProvider(this, viewModelFactory)[PurchaseItemViewModel::class.java]
+    }
+
+
+    private val myComponent by lazy {
+        (application as PurchaseItemApp).myComponent
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
+        myComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_purchase_item)
         parseIntent()

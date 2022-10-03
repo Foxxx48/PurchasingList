@@ -1,31 +1,20 @@
 package com.fox.purchasinglist.presentation
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
 import com.fox.purchasinglist.domain.DeletePurchaseItemUseCase
 import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
 import com.fox.purchasinglist.domain.GetListPurchaseItemUseCase
 import com.fox.purchasinglist.domain.PurchaseItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = PurchaseListRepositoryImpl(application)
-
-    private val getListPurchaseItemUseCase = GetListPurchaseItemUseCase(repository)
-    private val editPurchaseItemUseCase = EditPurchaseItemUseCase(repository)
-    private val deletePurchaseItemUseCase = DeletePurchaseItemUseCase(repository)
-
-
-
-//    private val _purchaseList = MutableLiveData<List<PurchaseItem>>()
-//    val purchaseList: LiveData<List<PurchaseItem>> get() = _purchaseList
+class MainViewModel @Inject constructor(
+    private val getListPurchaseItemUseCase: GetListPurchaseItemUseCase,
+    private val editPurchaseItemUseCase: EditPurchaseItemUseCase,
+    private val deletePurchaseItemUseCase: DeletePurchaseItemUseCase
+) : ViewModel() {
 
     val purchaseList = getListPurchaseItemUseCase.getListPurchase()
 

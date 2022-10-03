@@ -1,26 +1,17 @@
 package com.fox.purchasinglist.presentation
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.fox.purchasinglist.data.PurchaseListRepositoryImpl
-import com.fox.purchasinglist.domain.AddPurchaseItemUseCase
-import com.fox.purchasinglist.domain.EditPurchaseItemUseCase
-import com.fox.purchasinglist.domain.GetPurchaseItemUseCase
-import com.fox.purchasinglist.domain.PurchaseItem
+import androidx.lifecycle.*
+import com.fox.purchasinglist.data.repository.PurchaseListRepositoryImpl
+import com.fox.purchasinglist.domain.*
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class PurchaseItemViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = PurchaseListRepositoryImpl(application)
-
-    private val getPurchaseItemUseCase = GetPurchaseItemUseCase(repository)
-    private val addPurchaseItemUseCase = AddPurchaseItemUseCase(repository)
-    private val editPurchaseItemUseCase = EditPurchaseItemUseCase(repository)
-
-
+class PurchaseItemViewModel @Inject constructor(
+    private val getPurchaseItemUseCase: GetPurchaseItemUseCase,
+    private val editPurchaseItemUseCase: EditPurchaseItemUseCase,
+    private val addPurchaseItemUseCase: AddPurchaseItemUseCase
+) : ViewModel() {
 
     private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>

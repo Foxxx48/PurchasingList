@@ -1,6 +1,8 @@
 package com.fox.purchasinglist.domain
 
-class AddPurchaseItemUseCase(private val purchaseListRepository: PurchaseListRepository) {
+import javax.inject.Inject
+
+class AddPurchaseItemUseCase @Inject constructor(private val purchaseListRepository: PurchaseListRepository) {
 
     suspend fun addPurchase(purchaseItem: PurchaseItem) {
         purchaseListRepository.addPurchaseItem(purchaseItem)

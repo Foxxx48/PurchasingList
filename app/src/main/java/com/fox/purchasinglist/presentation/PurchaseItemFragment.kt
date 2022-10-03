@@ -12,14 +12,29 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.domain.PurchaseItem
 import com.google.android.material.textfield.TextInputLayout
+import javax.inject.Inject
 
 
 class PurchaseItemFragment : Fragment() {
 
-    private lateinit var viewModel: PurchaseItemViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel by lazy {
+
+        ViewModelProvider(this, viewModelFactory)[PurchaseItemViewModel::class.java]
+    }
+
+
+    private val myComponent by lazy {
+        (requireActivity().application as PurchaseItemApp).myComponent
+    }
+
+
     lateinit var onEditingFinishListener: OnEditingFinishListener
 
     private lateinit var tilName: TextInputLayout
@@ -28,10 +43,13 @@ class PurchaseItemFragment : Fragment() {
     private lateinit var etCount: EditText
     private lateinit var buttonSave: Button
 
+
+
     private var screenMode = MODE_UNKNOWN
     private var purchaseItemId = PurchaseItem.UNDEFINED_ID
 
     override fun onAttach(context: Context) {
+        myComponent.inject(this)
         super.onAttach(context)
         if (context is OnEditingFinishListener) {
             onEditingFinishListener = context
@@ -57,7 +75,6 @@ class PurchaseItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[PurchaseItemViewModel::class.java]
         initViews(view)
         addTextChangeListeners()
         launchRightMode()

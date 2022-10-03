@@ -1,8 +1,10 @@
-package com.fox.purchasinglist.data
+package com.fox.purchasinglist.data.mapper
 
+import com.fox.purchasinglist.data.database.PurchaseItemDbModel
 import com.fox.purchasinglist.domain.PurchaseItem
+import javax.inject.Inject
 
-class PurchaseListMapper {
+class PurchaseListMapper @Inject constructor() {
 
     fun mapEntityToDbModel(purchaseItem: PurchaseItem): PurchaseItemDbModel {
         return PurchaseItemDbModel(

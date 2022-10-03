@@ -1,4 +1,4 @@
-package com.fox.purchasinglist.presentation
+package com.fox.purchasinglist.presentation.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.fox.purchasinglist.domain.PurchaseItem

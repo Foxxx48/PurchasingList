@@ -5,29 +5,42 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainer
 import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
+import com.fox.purchasinglist.presentation.adapter.PurchaseListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
 
-    private lateinit var viewModel: MainViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel by lazy {
+
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    }
+
     private lateinit var purchaseListAdapter: PurchaseListAdapter
     private var purchaseItemContainer: FragmentContainerView? = null
 
+    private val myComponent by lazy {
+        (application as PurchaseItemApp).myComponent
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        myComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         purchaseItemContainer = findViewById(R.id.purchase_item_container)
 
         setupRecyclerView()
 
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.purchaseList.observe(this) {
             purchaseListAdapter.submitList(it)
         }

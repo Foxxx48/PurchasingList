@@ -1,4 +1,4 @@
-package com.fox.purchasinglist.data
+package com.fox.purchasinglist.data.database
 
 import android.app.Application
 import androidx.room.Database
