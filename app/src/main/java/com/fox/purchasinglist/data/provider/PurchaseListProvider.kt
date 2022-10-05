@@ -4,10 +4,11 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 
 class PurchaseListProvider : ContentProvider() {
     override fun onCreate(): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 
     override fun query(
@@ -17,7 +18,8 @@ class PurchaseListProvider : ContentProvider() {
         p3: Array<out String>?,
         p4: String?
     ): Cursor? {
-        TODO("Not yet implemented")
+        Log.d("PurchaseListProvider", "PurchaseListProvider fun query() $p0")
+        return null
     }
 
     override fun getType(p0: Uri): String? {
