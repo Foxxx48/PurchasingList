@@ -1,6 +1,8 @@
 package com.fox.purchasinglist.presentation
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,6 +20,7 @@ import com.fox.purchasinglist.databinding.FragmentPurchaseItemBinding
 import com.fox.purchasinglist.domain.PurchaseItem
 import com.google.android.material.textfield.TextInputLayout
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 
 class PurchaseItemFragment : Fragment() {
@@ -86,7 +89,7 @@ class PurchaseItemFragment : Fragment() {
             } else {
                 null
             }
-                binding.tilCount.error = message
+            binding.tilCount.error = message
         }
         viewModel.errorInputName.observe(viewLifecycleOwner) {
             val message = if (it) {
@@ -98,8 +101,6 @@ class PurchaseItemFragment : Fragment() {
         }
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
             onEditingFinishListener?.onEditingFinished()
-//            activity?.onBackPressed()
-
         }
     }
 
@@ -143,80 +144,97 @@ class PurchaseItemFragment : Fragment() {
 
         viewModel.purchaseItem.observe(viewLifecycleOwner) {
             binding.etName.setText(it.name)
-            println("PurchaseItem Name ${it.name}")
             binding.etCount.setText(it.count.toString())
-            println("PurchaseItem Count ${it.count}")
+
         }
 
         binding.btnSave.setOnClickListener {
-            viewModel.editPurchaseItem(
-                binding.etName.text?.toString(),
-                binding.etCount.text?.toString())
-        }
-    }
-
-    private fun launchAddMode() {
-        println("LaunchAddMode()")
-        binding.btnSave.setOnClickListener {
-            viewModel.addPurchaseItem(
-                binding.etName.text?.toString(),
-                binding.etCount.text?.toString())
-        }
-    }
-
-
-    private fun parseParams() {
-        val args = requireArguments()
-        if (!args.containsKey(SCREEN_MODE)) {
-            throw RuntimeException("Parameters of screen mode is absent")
-        }
-        val mode = args.getString(SCREEN_MODE)
-        println("parsParams mode = $mode")
-        if (mode != MODE_EDIT && mode != MODE_ADD) {
-            throw RuntimeException("Unknown screen mode $mode")
-        }
-        screenMode = mode
-        if (screenMode == MODE_EDIT) {
-            if (!args.containsKey(PURCHASE_ITEM_ID)) {
-                throw RuntimeException("Parameters of purchase item id is absent")
+            thread {
+                context?.contentResolver?.update(
+                    Uri.parse("content://com.fox.purchasinglist/purchase_list"),
+                    ContentValues().apply {
+                        put("id", purchaseItemId )
+                        put("name", binding.etName.text?.toString())
+                        put("count", binding.etCount.text?.toString()?.toInt())
+                        put("enabled", true)
+                    },
+                    null,
+                    arrayOf(purchaseItemId.toString())
+                    )
             }
-            purchaseItemId = args.getInt(PURCHASE_ITEM_ID, PurchaseItem.UNDEFINED_ID)
-            println("parseParams purchaseItemId  = $purchaseItemId")
         }
-
     }
-    interface OnEditingFinishListener {
-        fun onEditingFinished()
-    }
+        private fun launchAddMode() {
+            binding.btnSave.setOnClickListener {
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
-    companion object {
-        private val SCREEN_MODE = "extra_mode"
-        private val PURCHASE_ITEM_ID = "extra_purchase_item_id"
-        private val MODE_EDIT = "mode_edit"
-        private val MODE_ADD = "mode_add"
-        private const val MODE_UNKNOWN = ""
-
-        fun newInstanceAddItem(): PurchaseItemFragment {
-            return PurchaseItemFragment().apply {
-                arguments = Bundle().apply {
-                    putString(SCREEN_MODE, MODE_ADD)
+                thread {
+                    context?.contentResolver?.insert(
+                        Uri.parse("content://com.fox.purchasinglist/purchase_list"),
+                        ContentValues().apply {
+                            put("id", 0)
+                            put("name", binding.etName.text?.toString())
+                            put("count", binding.etCount.text?.toString()?.toInt())
+                            put("enabled", true)
+                        }
+                    )
                 }
             }
         }
 
-        fun newInstanceEditItem(purchaseItemId: Int): PurchaseItemFragment {
-            return PurchaseItemFragment().apply {
-                arguments = Bundle().apply {
-                    putString(SCREEN_MODE, MODE_EDIT)
-                    putInt(PURCHASE_ITEM_ID, purchaseItemId)
-                    println(purchaseItemId)
+
+        private fun parseParams() {
+            val args = requireArguments()
+            if (!args.containsKey(SCREEN_MODE)) {
+                throw RuntimeException("Parameters of screen mode is absent")
+            }
+            val mode = args.getString(SCREEN_MODE)
+            println("parsParams mode = $mode")
+            if (mode != MODE_EDIT && mode != MODE_ADD) {
+                throw RuntimeException("Unknown screen mode $mode")
+            }
+            screenMode = mode
+            if (screenMode == MODE_EDIT) {
+                if (!args.containsKey(PURCHASE_ITEM_ID)) {
+                    throw RuntimeException("Parameters of purchase item id is absent")
+                }
+                purchaseItemId = args.getInt(PURCHASE_ITEM_ID, PurchaseItem.UNDEFINED_ID)
+                println("parseParams purchaseItemId  = $purchaseItemId")
+            }
+
+        }
+
+        interface OnEditingFinishListener {
+            fun onEditingFinished()
+        }
+
+        override fun onDestroy() {
+            super.onDestroy()
+            _binding = null
+        }
+
+        companion object {
+            private val SCREEN_MODE = "extra_mode"
+            private val PURCHASE_ITEM_ID = "extra_purchase_item_id"
+            private val MODE_EDIT = "mode_edit"
+            private val MODE_ADD = "mode_add"
+            private const val MODE_UNKNOWN = ""
+
+            fun newInstanceAddItem(): PurchaseItemFragment {
+                return PurchaseItemFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(SCREEN_MODE, MODE_ADD)
+                    }
+                }
+            }
+
+            fun newInstanceEditItem(purchaseItemId: Int): PurchaseItemFragment {
+                return PurchaseItemFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(SCREEN_MODE, MODE_EDIT)
+                        putInt(PURCHASE_ITEM_ID, purchaseItemId)
+                        println(purchaseItemId)
+                    }
                 }
             }
         }
     }
-}

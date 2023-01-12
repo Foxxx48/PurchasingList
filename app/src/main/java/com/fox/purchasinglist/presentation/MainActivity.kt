@@ -1,5 +1,6 @@
 package com.fox.purchasinglist.presentation
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -12,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fox.purchasinglist.PurchaseItemApp
 import com.fox.purchasinglist.R
 import com.fox.purchasinglist.databinding.ActivityMainBinding
+import com.fox.purchasinglist.domain.PurchaseItem
 import com.fox.purchasinglist.presentation.adapter.PurchaseListAdapter
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishListener {
 
@@ -57,6 +60,31 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
                 launchFragment(PurchaseItemFragment.newInstanceAddItem())
             }
 
+        }
+
+        thread {
+            val cursor = contentResolver.query(
+                Uri.parse("content://com.fox.purchasinglist/purchase_list"),
+                null,
+                null,
+                null,
+                null
+            )
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val count = cursor.getInt(cursor.getColumnIndexOrThrow("count"))
+                val enabled = cursor.getInt(cursor.getColumnIndexOrThrow("enabled")) > 0
+
+                val purchaseItem = PurchaseItem(
+                    id = id,
+                    name = name,
+                    count = count,
+                    enabled = enabled
+                )
+                Log.d ("MainActivity", purchaseItem.toString())
+            }
+            cursor?.close()
         }
     }
 
@@ -111,7 +139,14 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnEditingFinishLi
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val item = purchaseListAdapter.currentList[viewHolder.adapterPosition]
-                viewModel.deletePurchaseItem(item)
+//                viewModel.deletePurchaseItem(item)
+                thread {
+                    contentResolver.delete(
+                        Uri.parse("content://com.fox.purchasinglist/purchase_list"),
+                        null,
+                        arrayOf(item.id.toString())
+                    )
+                }
             }
         }
 
