@@ -1,8 +1,8 @@
 package com.fox.purchasinglist.domain
 
-class GetListPurchaseItemUseCase(private val purchaseListRepository: PurchaseListRepository) {
+import androidx.lifecycle.LiveData
+import javax.inject.Inject
 
-    fun getListPurchase(): List<PurchaseItem> {
-        return purchaseListRepository.getListPurchaseItem()
-    }
+class GetListPurchaseItemUseCase @Inject constructor(private val purchaseListRepository: PurchaseListRepository) {
+    operator fun invoke() = purchaseListRepository.getListPurchaseItem()
 }

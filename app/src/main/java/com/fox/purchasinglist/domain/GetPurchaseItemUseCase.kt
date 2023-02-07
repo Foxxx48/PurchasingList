@@ -1,8 +1,9 @@
 package com.fox.purchasinglist.domain
 
-class GetPurchaseItemUseCase(private val purchaseListRepository: PurchaseListRepository) {
+import javax.inject.Inject
 
-    fun getPurchase(purchaseItemId: Int): PurchaseItem {
-        return purchaseListRepository.getPurchaseItem(purchaseItemId)
-    }
+class GetPurchaseItemUseCase @Inject constructor(private val purchaseListRepository: PurchaseListRepository) {
+    suspend operator fun invoke(
+        purchaseItemId: Int
+    ) = purchaseListRepository.getPurchaseItem(purchaseItemId)
 }
