@@ -13,11 +13,12 @@ With the ability to edit and delete purchases.
 <br />
 
 ### Technology stack:
+- Android SDK
 - Kotlin
 - MVVM
 - Room
 - Coroutines
-- Dagger 2
+- Dagger 
 
 
 ### UI example:
